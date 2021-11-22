@@ -18,7 +18,9 @@
 *******************************************************************
 """
 
-import sys, traceback, logging, getopt, threading, ssl, signal
+import os, sys, traceback, logging, getopt, threading, ssl, signal, appdirs
+
+import mboss_py_core.mboss_path
 
 from .V311 import MQTTBrokers as MQTTV3Brokers
 from .V5 import MQTTBrokers as MQTTV5Brokers
@@ -119,6 +121,11 @@ def process_config(config, options):
             if words[1] == "false":
               allow_non_sni_connections = False
         if protocol == "mqtt":
+          ddir = mboss_py_core.mboss_path.mboss_data_dir()
+          if TLS:
+            ca_certs = os.path.join(ddir, ca_certs)
+            certfile = os.path.join(ddir, certfile)
+            keyfile = os.path.join(ddir, keyfile)
           servers_to_create.append((TCPListeners, {"host":bind_address, "port":port, "TLS":TLS, "cert_reqs":cert_reqs,
                       "ca_certs":ca_certs, "certfile":certfile, "keyfile":keyfile, 
                       "allow_non_sni_connections":allow_non_sni_connections}))
